@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon">
+    <title>Contador de Dias</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variáveis de cor ajustadas para o estilo neumórfico */
+        :root {
+            --bg-color: #e0e5ec; /* Nova cor de fundo principal */
+            --main-color: #c4d0da; /* Mantido do exemplo anterior para consistência */
+            --text-color: #333; /* Cor de texto principal */
+            --shadow-light: #ffffff; /* Sombra clara */
+            --shadow-dark: #a7b1c3; /* Sombra escura */
+            --accent-color: #007bff; /* Cor de destaque (ex: botões) - ajustável */
+            --accent-hover: #0056b3; /* Cor de destaque ao hover - ajustável */
+            --delete-color: #dc3545; /* Cor para ações de exclusão - ajustável */
+            --delete-hover: #c82333; /* Cor para ações de exclusão ao hover - ajustável */
+
+            /* Cores originais do contador de dias, remapeadas ou adaptadas */
+            --system-purple-dark: #6a1a7f; /* Adaptação para um tom de roxo que combine */
+            --system-purple: #9c27b0; /* Adaptação para um tom de roxo que combine */
+            --system-purple-light: #d8c1e7; /* Adaptação para um tom de roxo que combine */
+            --system-purple-gray: #7b7b7b; /* Adaptação para um cinza que combine */
+            --system-background: var(--bg-color); /* Usa a cor de fundo neumórfica */
+            --system-grouped-background: var(--bg-color); /* Usa a cor de fundo neumórfica */
+            --separator-color: #c4d0da; /* Cor de separador */
+            --holiday-color: #b000b0; /* Mantido, é uma cor de destaque */
+            --holiday-light: #fbe6fb; /* Adaptado para uma versão mais clara que combine */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color); /* Aplicado o fundo neumórfico */
+            color: var(--text-color); /* Aplicado a cor de texto neumórfica */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px; /* Aumentado padding para corresponder ao estilo */
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px; /* Aumentado de 900px para 950px */
+            background-color: var(--bg-color); /* Aplicado o fundo neumórfico */
+            border-radius: 20px; /* Bordas mais arredondadas */
+            /* Sombras neumórficas para o container principal */
+            box-shadow: 8px 8px 15px var(--shadow-dark), -8px -8px 15px var(--shadow-light);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px 16px;
+            /* Usando a sombra para separar, não a borda sólida */
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--separator-color); /* Manter uma linha sutil para separar */
+        }
+
+        .header h1 {
+            font-size: clamp(18px, 4vw, 24px);
+            font-weight: 600;
+            text-align: center;
+            color: var(--system-purple-dark); /* Mantido o roxo escuro para o título */
+            letter-spacing: -0.2px;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+                min-height: 500px;
+            }
+        }
+
+        .form-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--separator-color); /* Manter uma linha sutil para separar */
+        }
+
+        @media (min-width: 768px) {
+            .form-section {
+                flex: 1;
+                border-right: 1px solid var(--separator-color); /* Manter uma linha sutil para separar */
+                border-bottom: none;
+                padding: 24px;
+            }
+        }
+
+        .calendar-section {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            .calendar-section {
+                flex: 1.2;
+                padding: 24px;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .form-group {
+                margin-bottom: 24px;
+            }
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: var(--system-purple-gray);
+            margin-bottom: 8px;
+            font-weight: 500;
+            letter-spacing: -0.1px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            font-size: 16px;
+            border: none; /* Removida a borda sólida */
+            border-radius: 12px; /* Bordas mais arredondadas */
+            background-color: var(--bg-color); /* Fundo igual ao do corpo */
+            /* Sombras inset para o efeito de "pressionado" */
+            box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+            color: var(--text-color);
+        }
+
+        @media (min-width: 768px) {
+            .input-field {
+                padding: 14px 44px 14px 14px;
+                font-size: 17px;
+            }
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: transparent; /* A borda será transparente, o foco é dado pela sombra */
+            /* Sombra mais pronunciada no foco para indicar interação */
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light), 0 0 0 2px var(--system-purple-light);
+        }
+
+/* Esconder as setas nativas do input type="number" */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            appearance: none; /* Adicione esta linha para compatibilidade */
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield; /* Firefox */
+            appearance: textfield; /* Adicione esta linha para compatibilidade do Firefox */
+        }
+        /* Estilo para o container do input de número com botões customizados */
+        .number-input-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 10px; /* Espaçamento entre os botões e o input */
+        }
+
+        .number-input-container .input-field {
+            flex-grow: 1; /* Faz o input ocupar o espaço restante */
+            text-align: center; /* Centraliza o texto do número */
+            padding-right: 12px; /* Ajusta o padding para não ter ícone à direita */
+        }
+
+        .number-spinner-button {
+            width: 40px; /* Tamanho dos botões de spinner */
+            height: 40px; /* Tamanho dos botões de spinner */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 50%; /* Botões redondos */
+            background-color: var(--bg-color);
+            color: var(--system-purple);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            /* Sombras neumórficas para os botões */
+            box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+            flex-shrink: 0; /* Previne que o botão diminua */
+        }
+
+        .number-spinner-button:hover {
+            /* Efeito de "pressionar" ao hover */
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+            color: var(--system-purple-dark);
+        }
+
+        .number-spinner-button:active {
+            box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .switch-label {
+            flex: 1;
+            font-size: 16px;
+            color: var(--text-color); /* Cor de texto neumórfica */
+            font-weight: 400;
+        }
+
+        @media (min-width: 768px) {
+            .switch-label {
+                font-size: 17px;
+            }
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .switch {
+                width: 52px;
+                height: 32px;
+            }
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-color); /* Cor de fundo base */
+            transition: .4s;
+            border-radius: 16px;
+            /* Sombras neumórficas para o slider "não ativado" */
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 2px;
+            bottom: 2px;
+            background-color: var(--shadow-light); /* Cor do "botão" do slider */
+            transition: .4s;
+            border-radius: 50%;
+            /* Sombra para o "botão" do slider */
+            box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+        }
+
+        @media (min-width: 768px) {
+            .slider:before {
+                height: 28px;
+                width: 28px;
+            }
+        }
+
+        input:checked + .slider {
+            background-color: var(--system-purple); /* Cor de ativação do slider */
+            /* Sem sombras inset quando ativado, para parecer que "saltou" */
+            box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background-color: var(--system-purple-dark); /* Cor do "botão" quando ativado */
+        }
+
+        .button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--bg-color); /* Fundo igual ao do corpo */
+            color: var(--system-purple-dark); /* Cor do texto do botão */
+            border: none;
+            border-radius: 12px; /* Bordas mais arredondadas */
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.2s ease;
+            /* Sombras neumórficas para o botão */
+            box-shadow: 6px 6px 10px var(--shadow-dark), -6px -6px 10px var(--shadow-light);
+        }
+
+        @media (min-width: 768px) {
+            .button {
+                font-size: 17px;
+            }
+        }
+
+        .button:hover {
+            /* Efeito de "pressionar" ao hover */
+            box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+            background-color: var(--system-purple-light); /* Cor de fundo sutil ao hover */
+            color: var(--system-purple-dark);
+            transform: translateY(0); /* Remove o transform y */
+        }
+
+        .button:active {
+            transform: translateY(0);
+            /* Sombra mais pronunciada de "pressionado" ao active */
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+        }
+
+        .result-container {
+            margin-top: 32px;
+            padding: 20px;
+            background-color: var(--bg-color); /* Fundo igual ao do corpo */
+            border-radius: 20px; /* Bordas mais arredondadas */
+            text-align: center;
+            display: none;
+            /* Sombras neumórficas para o container de resultado */
+            box-shadow: 8px 8px 15px var(--shadow-dark), -8px -8px 15px var(--shadow-light);
+            border: none; /* Removida a borda sólida */
+        }
+
+        @media (min-width: 768px) {
+            .result-container {
+                margin-top: 24px; /* Ajuste para espaçamento consistente */
+                padding: 24px;
+            }
+        }
+
+        .result-title {
+            font-size: 14px;
+            color: var(--system-purple-dark);
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (min-width: 768px) {
+            .result-title {
+                font-size: 15px;
+            }
+        }
+
+        .result-day {
+            font-size: clamp(28px, 7vw, 36px);
+            color: var(--holiday-color); /* Mantido para destaque */
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        /* Calendar Styles (Main Calendar) */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .calendar-title {
+            font-size: clamp(16px, 3vw, 20px);
+            font-weight: 600;
+            color: var(--system-purple-dark);
+        }
+
+        .nav-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-color); /* Fundo igual ao do corpo */
+            border: none;
+            color: var(--system-purple);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            /* Sombras neumórficas para o botão de navegação */
+            box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+        }
+
+        .nav-button:hover {
+            background-color: var(--bg-color); /* Fundo igual ao do corpo */
+            /* Efeito de "pressionar" ao hover */
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+            color: var(--system-purple-dark);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        @media (min-width: 400px) {
+            .calendar-grid {
+                gap: 6px;
+            }
+        }
+
+        .day-header {
+            text-align: center;
+            font-size: 12px;
+            color: var(--system-purple-gray);
+            padding: 8px 0;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (min-width: 400px) {
+            .day-header {
+                font-size: 13px;
+                padding: 10px 0;
+            }
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: default;
+            position: relative;
+            transition: all 0.2s ease;
+            background-color: var(--bg-color); /* Fundo igual ao do corpo */
+            color: var(--text-color);
+        }
+
+        @media (min-width: 400px) {
+            .day-cell {
+                font-size: 16px;
+            }
+        }
+
+        .day-cell.today {
+            background-color: var(--system-purple);
+            color: white;
+            font-weight: 500;
+            /* Sombra para o dia "hoje" */
+            box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+        }
+
+        .day-cell.counted-day {
+            background-color: var(--system-purple-light);
+            color: var(--system-purple-dark);
+            font-weight: 500;
+            /* Sombra sutil para dias contados */
+            box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);
+        }
+
+        .day-cell.counted-day.selected {
+            background-color: var(--system-purple-dark);
+            color: white;
+            font-weight: 600;
+            /* Sombra mais pronunciada para o dia selecionado */
+            box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+        }
+
+        .day-cell.holiday {
+            color: var(--holiday-color);
+            background-color: var(--holiday-light);
+            /* Sombra sutil para feriados */
+            box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);
+        }
+
+        .day-cell.holiday.counted-day {
+            background-color: var(--holiday-color);
+            color: white;
+            font-weight: 500;
+            /* Sombra para feriados contados */
+            box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+        }
+
+        .day-cell.weekend {
+            color: var(--system-purple-gray);
+            opacity: 0.8;
+        }
+
+        /* Tooltip styles */
+        .day-cell[data-tooltip] {
+            position: relative;
+        }
+
+        .day-cell[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--system-purple-dark);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 400;
+            white-space: nowrap;
+            z-index: 100;
+            margin-bottom: 6px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .day-cell[data-tooltip]:hover::before {
+            content: "";
+            position: absolute;
+            bottom: calc(100% - 5px);
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--system-purple-dark) transparent transparent transparent;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .day-cell[data-tooltip]:hover::after,
+        .day-cell[data-tooltip]:hover::before {
+            opacity: 1;
+        }
+
+        /* Date Picker Styles */
+        .date-picker {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .date-picker-icon {
+            position: absolute;
+            right: 12px;
+            color: var(--system-purple-gray);
+            cursor: pointer;
+            transition: color 0.2s ease;
+            font-size: 16px;
+        }
+
+        .date-picker:focus-within .date-picker-icon {
+            color: var(--system-purple);
+        }
+
+        /* Custom Calendar Popup */
+        .custom-calendar {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            background-color: var(--bg-color); /* Fundo igual ao do corpo */
+            border: none; /* Removida borda sólida */
+            border-radius: 20px; /* Bordas mais arredondadas */
+            /* Sombras neumórficas para o popup */
+            box-shadow: 8px 8px 15px var(--shadow-dark), -8px -8px 15px var(--shadow-light);
+            z-index: 1000;
+            padding: 16px;
+            width: 280px;
+        }
+
+        .custom-calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .custom-calendar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--system-purple-dark);
+        }
+
+        .custom-nav-button {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-color); /* Fundo igual ao do corpo */
+            border: none;
+            color: var(--system-purple);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            /* Sombras neumórficas para o botão de navegação */
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+        }
+
+        .custom-nav-button:hover {
+            background-color: var(--bg-color); /* Fundo igual ao do corpo */
+            /* Efeito de "pressionar" ao hover */
+            box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);
+            color: var(--system-purple-dark);
+        }
+
+        .custom-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .custom-day-header {
+            text-align: center;
+            font-size: 12px;
+            color: var(--system-purple-gray);
+            padding: 6px 0;
+            font-weight: 500;
+        }
+
+        .custom-day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: var(--bg-color); /* Fundo igual ao do corpo */
+            color: var(--text-color);
+        }
+
+        .custom-day-cell:hover {
+            background-color: var(--bg-color); /* Fundo igual ao do corpo */
+            color: var(--system-purple-dark);
+            /* Efeito de "pressionar" ao hover */
+            box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);
+        }
+
+        .custom-day-cell.today {
+            background-color: var(--system-purple);
+            color: white;
+            font-weight: 500;
+            /* Sombra para o dia "hoje" */
+            box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+        }
+
+        .custom-day-cell.selected {
+            background-color: var(--system-purple-dark);
+            color: white;
+            font-weight: 600;
+            /* Sombra para o dia selecionado */
+            box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+        }
+
+        .custom-day-cell.disabled {
+            color: var(--system-purple-gray);
+            opacity: 0.5;
+            cursor: default;
+            /* Remove sombras para dias desabilitados */
+            box-shadow: none;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--separator-color); /* Manter uma linha sutil para separar */
+        }
+
+        @media (min-width: 400px) {
+            .legend {
+                gap: 12px;
+                padding-top: 20px;
+            }
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            color: var(--system-purple-gray);
+        }
+
+        @media (min-width: 400px) {
+            .legend-item {
+                font-size: 12px;
+            }
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+            /* Sombras sutis para os itens da legenda */
+            box-shadow: 1px 1px 2px var(--shadow-dark), -1px -1px 2px var(--shadow-light);
+        }
+
+        @media (min-width: 400px) {
+            .legend-color {
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+        .legend-today {
+            background-color: var(--system-purple);
+        }
+
+        .legend-counted {
+            background-color: var(--system-purple-light);
+            border: none; /* Removida a borda sólida */
+        }
+
+        .legend-counted-selected {
+            background-color: var(--system-purple-dark);
+        }
+
+        .legend-holiday {
+            background-color: var(--holiday-color);
+        }
+
+        .legend-weekend {
+            background-color: var(--system-purple-gray);
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Contador de Dias</h1>
+        </div>
+        
+        <div class="content">
+            <div class="form-section">
+                <div class="form-group date-picker">
+                    <label for="start-date">DATA INICIAL</label>
+                    <input type="text" id="start-date" class="input-field" placeholder="DD/MM/AAAA">
+                    <i class="fas fa-calendar-alt date-picker-icon"></i>
+                    <div class="custom-calendar" id="custom-calendar">
+                        <div class="custom-calendar-header">
+                            <button class="custom-nav-button" id="custom-prev-month"><i class="fas fa-chevron-left"></i></button>
+                            <div class="custom-calendar-title" id="custom-current-month"></div>
+                            <button class="custom-nav-button" id="custom-next-month"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <div class="custom-calendar-grid" id="custom-calendar-grid">
+                            <div class="custom-day-header">Dom</div>
+                            <div class="custom-day-header">Seg</div>
+                            <div class="custom-day-header">Ter</div>
+                            <div class="custom-day-header">Qua</div>
+                            <div class="custom-day-header">Qui</div>
+                            <div class="custom-day-header">Sex</div>
+                            <div class="custom-day-header">Sáb</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="days-count">DIAS PARA CONTAR</label>
+                    <div class="number-input-container">
+                        <button type="button" class="number-spinner-button" id="decrement-days"><i class="fas fa-minus"></i></button>
+                        <input type="number" id="days-count" class="input-field" min="1" value="10">
+                        <button type="button" class="number-spinner-button" id="increment-days"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+                
+                <div class="switch-container">
+                    <span class="switch-label">Apenas dias úteis</span>
+                    <label class="switch">
+                        <input type="checkbox" id="business-days">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="switch-container">
+                    <span class="switch-label">Excluir feriados</span>
+                    <label class="switch">
+                        <input type="checkbox" id="exclude-holidays">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <button class="button" id="calculate-btn">Calcular</button>
+                
+                <div class="result-container" id="result-container">
+                    <div class="result-title">Data Final</div>
+                    <div class="result-day" id="result-day"></div>
+                    <div class="result-date" id="result-date"></div>
+                </div>
+            </div>
+            
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <button class="nav-button" id="prev-month">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="calendar-title" id="current-month"></div>
+                    <button class="nav-button" id="next-month">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="calendar-grid" id="calendar-grid">
+                    <div class="day-header">Dom</div>
+                    <div class="day-header">Seg</div>
+                    <div class="day-header">Ter</div>
+                    <div class="day-header">Qua</div>
+                    <div class="day-header">Qui</div>
+                    <div class="day-header">Sex</div>
+                    <div class="day-header">Sáb</div>
+                </div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <span class="legend-color legend-today"></span>
+                        <span>Hoje</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color legend-counted"></span>
+                        <span>Contados</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color legend-counted-selected"></span>
+                        <span>Selecionado</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color legend-holiday"></span>
+                        <span>Feriado</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color legend-weekend"></span>
+                        <span>Final de semana</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize variables
+            const today = new Date();
+            let currentMonth = today.getMonth();
+            let currentYear = today.getFullYear();
+            let holidays = [];
+            let countedDays = [];
+            let startDate = null;
+            let calendarMonth = today.getMonth();
+            let calendarYear = today.getFullYear();
+
+            // Set default date in input
+            const dateInput = document.getElementById('start-date');
+            dateInput.value = formatInputDate(today);
+
+            // Load holidays for current year
+            holidays = await fetchHolidays(currentYear);
+            generateCalendar(currentMonth, currentYear);
+
+            // Input mask for DD/MM/AAAA
+            dateInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 8) value = value.slice(0, 8);
+                let formatted = '';
+                if (value.length > 0) formatted += value.slice(0, 2);
+                if (value.length > 2) formatted += '/' + value.slice(2, 4);
+                if (value.length > 4) formatted += '/' + value.slice(4, 8);
+                e.target.value = formatted;
+            });
+
+            // Validate date on blur
+            dateInput.addEventListener('blur', function() {
+                const value = this.value;
+                if (value && !isValidDate(value)) {
+                    alert('Por favor, insira uma data válida no formato DD/MM/AAAA.');
+                    this.value = formatInputDate(today);
+                }
+            });
+
+            // Custom calendar functionality
+            const calendarContainer = document.getElementById('custom-calendar');
+            const calendarGrid = document.getElementById('custom-calendar-grid');
+            const calendarTitle = document.getElementById('custom-current-month');
+            const prevMonthBtn = document.getElementById('custom-prev-month');
+            const nextMonthBtn = document.getElementById('custom-next-month');
+            const datePickerIcon = dateInput.parentElement.querySelector('.date-picker-icon');
+
+            function toggleCalendar(show = !calendarContainer.style.display || calendarContainer.style.display === 'none') {
+                calendarContainer.style.display = show ? 'block' : 'none';
+                if (show) {
+                    const inputDate = parseInputDate(dateInput.value) || today;
+                    calendarMonth = inputDate.getMonth();
+                    calendarYear = inputDate.getFullYear();
+                    generateCustomCalendar(calendarMonth, calendarYear, inputDate);
+                }
+            }
+
+            dateInput.addEventListener('focus', () => toggleCalendar(true));
+            datePickerIcon.addEventListener('click', () => toggleCalendar(true));
+
+            document.addEventListener('click', (e) => {
+                if (!dateInput.contains(e.target) && !calendarContainer.contains(e.target) && !datePickerIcon.contains(e.target)) {
+                    toggleCalendar(false);
+                }
+            });
+
+            prevMonthBtn.addEventListener('click', () => {
+                calendarMonth--;
+                if (calendarMonth < 0) {
+                    calendarMonth = 11;
+                    calendarYear--;
+                }
+                generateCustomCalendar(calendarMonth, calendarYear, parseInputDate(dateInput.value));
+            });
+
+            nextMonthBtn.addEventListener('click', () => {
+                calendarMonth++;
+                if (calendarMonth > 11) {
+                    calendarMonth = 0;
+                    calendarYear++;
+                }
+                generateCustomCalendar(calendarMonth, calendarYear, parseInputDate(dateInput.value));
+            });
+
+            function generateCustomCalendar(month, year, selectedDate) {
+                while (calendarGrid.children.length > 7) {
+                    calendarGrid.removeChild(calendarGrid.lastChild);
+                }
+
+                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                calendarTitle.textContent = `${monthNames[month]} ${year}`;
+
+                const firstDay = new Date(year, month, 1);
+                const startingDay = firstDay.getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                for (let i = 0; i < startingDay; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.classList.add('custom-day-cell', 'disabled');
+                    calendarGrid.appendChild(emptyCell);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
+                    const dayCell = document.createElement('div');
+                    dayCell.classList.add('custom-day-cell');
+                    dayCell.textContent = day;
+
+                    if (date.toDateString() === today.toDateString()) {
+                        dayCell.classList.add('today');
+                    }
+
+                    if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
+                        dayCell.classList.add('selected');
+                    }
+
+                    dayCell.addEventListener('click', () => {
+                        dateInput.value = formatInputDate(date);
+                        toggleCalendar(false);
+                    });
+
+                    calendarGrid.appendChild(dayCell);
+                }
+            }
+
+            // --- NOVO: Lógica para os botões de incrementar/decrementar dias ---
+            const daysCountInput = document.getElementById('days-count');
+            const decrementBtn = document.getElementById('decrement-days');
+            const incrementBtn = document.getElementById('increment-days');
+
+            decrementBtn.addEventListener('click', () => {
+                let currentValue = parseInt(daysCountInput.value);
+                if (currentValue > 1) { // Garante que não vá abaixo de 1 (ou min, se alterado)
+                    daysCountInput.value = currentValue - 1;
+                }
+            });
+
+            incrementBtn.addEventListener('click', () => {
+                let currentValue = parseInt(daysCountInput.value);
+                daysCountInput.value = currentValue + 1;
+            });
+            // --- FIM NOVO: Lógica para os botões de incrementar/decrementar dias ---
+
+
+            // Event listeners for main calendar
+            document.getElementById('calculate-btn').addEventListener('click', calculateDate);
+            document.getElementById('prev-month').addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                generateCalendar(currentMonth, currentYear);
+            });
+
+            document.getElementById('next-month').addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                generateCalendar(currentMonth, currentYear);
+            });
+
+            // Calculate date function
+            async function calculateDate() {
+                const startDateInput = parseInputDate(document.getElementById('start-date').value);
+                const daysToAdd = parseInt(document.getElementById('days-count').value);
+                const businessDaysOnly = document.getElementById('business-days').checked;
+                const excludeHolidays = document.getElementById('exclude-holidays').checked;
+
+                if (!startDateInput || !isValidDate(document.getElementById('start-date').value) || isNaN(daysToAdd)) {
+                    alert('Por favor, preencha todos os campos corretamente.');
+                    return;
+                }
+
+                startDate = new Date(startDateInput);
+                countedDays = [new Date(startDate)];
+
+                if (excludeHolidays) {
+                    try {
+                        holidays = await fetchHolidays(startDate.getFullYear());
+                        const nextYear = new Date(startDate);
+                        nextYear.setDate(startDate.getDate() + daysToAdd * 2);
+                        if (nextYear.getFullYear() > startDate.getFullYear()) {
+                            const nextYearHolidays = await fetchHolidays(nextYear.getFullYear());
+                            holidays = [...holidays, ...nextYearHolidays];
+                        }
+                    } catch (error) {
+                        console.error('Error fetching holidays:', error);
+                        holidays = getDefaultHolidays(startDate.getFullYear());
+                    }
+                }
+
+                let date = new Date(startDate);
+                let daysAdded = 0;
+
+                while (daysAdded < daysToAdd) {
+                    date.setDate(date.getDate() + 1);
+
+                    let shouldCount = true;
+
+                    if (businessDaysOnly) {
+                        const dayOfWeek = date.getDay();
+                        shouldCount = dayOfWeek !== 0 && dayOfWeek !== 6;
+                    }
+
+                    if (excludeHolidays && shouldCount) {
+                        const isHoliday = holidays.some(h => 
+                            h.date.getDate() === date.getDate() && 
+                            h.date.getMonth() === date.getMonth() && 
+                            h.date.getFullYear() === date.getFullYear()
+                        );
+                        shouldCount = !isHoliday;
+                    }
+
+                    if (shouldCount) {
+                        daysAdded++;
+                        countedDays.push(new Date(date));
+                    }
+                }
+
+                const resultContainer = document.getElementById('result-container');
+                const resultDay = document.getElementById('result-day');
+                const resultDate = document.getElementById('result-date');
+
+                resultDay.textContent = date.getDate();
+                resultDate.textContent = formatDate(date);
+                resultContainer.style.display = 'block';
+
+                if (date.getMonth() !== currentMonth || date.getFullYear() !== currentYear) {
+                    currentMonth = date.getMonth();
+                    currentYear = date.getFullYear();
+                    generateCalendar(currentMonth, currentYear);
+                } else {
+                    generateCalendar(currentMonth, currentYear);
+                }
+            }
+
+            // Generate main calendar
+            function generateCalendar(month, year) {
+                const calendarGrid = document.getElementById('calendar-grid');
+                const monthDisplay = document.getElementById('current-month');
+
+                while (calendarGrid.children.length > 7) {
+                    calendarGrid.removeChild(calendarGrid.lastChild);
+                }
+
+                const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                monthDisplay.textContent = `${monthNames[month]} ${year}`;
+
+                const firstDay = new Date(year, month, 1);
+                const startingDay = firstDay.getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                for (let i = 0; i < startingDay; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.classList.add('day-cell');
+                    calendarGrid.appendChild(emptyCell);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
+                    const dayCell = document.createElement('div');
+                    dayCell.classList.add('day-cell');
+                    dayCell.textContent = day;
+
+                    if (date.getDate() === today.getDate() && 
+                        date.getMonth() === today.getMonth() && 
+                        date.getFullYear() === today.getFullYear()) {
+                        dayCell.classList.add('today');
+                    }
+
+                    const dayOfWeek = date.getDay();
+                    if (dayOfWeek === 0 || dayOfWeek === 6) {
+                        dayCell.classList.add('weekend');
+                    }
+
+                    const holiday = holidays.find(h => 
+                        h.date.getDate() === date.getDate() && 
+                        h.date.getMonth() === date.getMonth() && 
+                        h.date.getFullYear() === date.getFullYear()
+                    );
+
+                    if (holiday) {
+                        dayCell.classList.add('holiday');
+                        dayCell.setAttribute('data-tooltip', holiday.name);
+                    }
+
+                    if (startDate && 
+                        date.getDate() === startDate.getDate() && 
+                        date.getMonth() === startDate.getMonth() && 
+                        date.getFullYear() === startDate.getFullYear()) {
+                        dayCell.classList.add('today');
+                    }
+
+                    const isCountedDay = countedDays.some(d => 
+                        d.getDate() === date.getDate() && 
+                        d.getMonth() === date.getMonth() && 
+                        d.getFullYear() === date.getFullYear()
+                    );
+
+                    if (isCountedDay) {
+                        dayCell.classList.add('counted-day');
+
+                        if (countedDays.length > 0 && 
+                            date.getDate() === countedDays[countedDays.length-1].getDate() && 
+                            date.getMonth() === countedDays[countedDays.length-1].getMonth() && 
+                            date.getFullYear() === countedDays[countedDays.length-1].getFullYear()) {
+                            dayCell.classList.add('selected');
+                        }
+                    }
+
+                    calendarGrid.appendChild(dayCell);
+                }
+            }
+
+            // Helper functions
+            function parseInputDate(str) {
+                const match = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+                if (!match) return null;
+                const day = parseInt(match[1], 10);
+                const month = parseInt(match[2], 10) - 1;
+                const year = parseInt(match[3], 10);
+                const date = new Date(year, month, day);
+                return isValidDate(str) ? date : null;
+            }
+
+            function isValidDate(str) {
+                const match = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+                if (!match) return false;
+                const day = parseInt(match[1], 10);
+                const month = parseInt(match[2], 10) - 1;
+                const year = parseInt(match[3], 10);
+                const date = new Date(year, month, day);
+                return date.getDate() === day && date.getMonth() === month && date.getFullYear() === year;
+            }
+
+            function formatInputDate(date) {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+
+            function formatDate(date) {
+                const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+                return date.toLocaleDateString('pt-BR', options);
+            }
+
+            async function fetchHolidays(year) {
+                try {
+                    const response = await fetch(`https://brasilapi.com.br/api/feriados/v1/${year}`);
+                    if (!response.ok) throw new Error('Failed to fetch holidays');
+                    const data = await response.json();
+                    return data.map(holiday => ({
+                        name: holiday.name,
+                        date: new Date(holiday.date + 'T00:00:00'),
+                        type: holiday.type || 'Feriado Nacional'
+                    }));
+                } catch (error) {
+                    console.error('Error fetching holidays:', error);
+                    return getDefaultHolidays(year);
+                }
+            }
+
+            function getDefaultHolidays(year) {
+                return [
+                    { name: 'Ano Novo', date: new Date(year, 0, 1) },
+                    { name: 'Carnaval', date: new Date(year, 1, 21) },
+                    { name: 'Sexta-Feira Santa', date: new Date(year, 3, 7) },
+                    { name: 'Tiradentes', date: new Date(year, 3, 21) },
+                    { name: 'Dia do Trabalho', date: new Date(year, 4, 1) },
+                    { name: 'Corpus Christi', date: new Date(year, 5, 15) },
+                    { name: 'Independência', date: new Date(year, 8, 7) },
+                    { name: 'Nossa Senhora Aparecida', date: new Date(year, 9, 12) },
+                    { name: 'Finados', date: new Date(year, 10, 2) },
+                    { name: 'Proclamação da República', date: new Date(year, 10, 15) },
+                    { name: 'Natal', date: new Date(year, 11, 25) }
+                ];
+            }
+        });
+    </script>
+</body>
+</html>
